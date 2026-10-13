@@ -109,7 +109,7 @@ function render(){var h='';
   h+='<div class="card '+st+' rv in" id="st'+i+'"><div class="lock">🔒<small>أنجز المرحلة السابقة</small></div><div class="art"><img src="'+IMG[i]+'"></div><div class="cb"><h3>'+s.ic+' '+s.t+(i<cur?' ✅':'')+'</h3><p>'+s.d+'</p><button class="b" style="background:'+s.c+'" '+(i>cur?'disabled':'')+' onclick="openS('+i+')">'+s.b+' &nbsp;&gt;</button></div></div>'+(i<3?'<div class="dots"></div>':'')});
  $('stages').innerHTML=h;
  $('nav').innerHTML=NAV.map(function(n,i){return '<span class="'+(i==0?'on':'')+'" onclick="go()">'+n+'</span>'}).join('');
- var nv=$('nav').children;if(cur>0){nv[0].className='';nv[[0,7,5,1,2][Math.min(cur,4)]||1].className='on'}
+ var nv=$('nav').children;if(cur>0){nv[0].className='';(nv[[0,7,5,1,2][Math.min(cur,4)]]||nv[1]).className='on'}
 }
 function go(){var c=$('st'+Math.min(cur,3));c.scrollIntoView({behavior:'smooth',block:'center'});c.animate([{boxShadow:'0 0 0 #d9a94a'},{boxShadow:'0 0 40px 8px #d9a94a'},{boxShadow:'0 0 0 #d9a94a'}],{duration:1400})}
 function openS(i){op=i;modal(S[i].t,C[i]()+'<div style="text-align:center;margin-top:14px"><button id="fin" class="b" style="background:#1f6b49" '+(i<cur?'':'disabled')+' onclick="fin()">'+(i<cur?'إغلاق':'أنجزت المرحلة ✓')+'</button></div>')}
@@ -153,11 +153,11 @@ function pt(){return Math.max(10-4*W,2)}
 act=function(){};
 openS=function(i){op=i;W=0;var d=i<cur;modal(S[i].t,C[i]()+(i&&!d?qz(i):'')+`<div style='text-align:center;margin-top:14px'><button id='fin' class='b' style='background:#1f6b49' ${d?'':'disabled'} onclick='fin()'>${d?'إغلاق':'أنجزت المرحلة ✓'}</button></div>`)};
 ans=function(b,ok){var d=op<cur,f=$('fb');if(ok){b.className='opt ok';var g=!d&&!AW[op];f.textContent='إجابة صحيحة! 🎉'+(g?' +'+pt()+' نقاط':'');if(g){AW[op]=1;U.score+=pt();save();lbR()}$('fin').disabled=false}else{b.className='opt no';W++;f.textContent='حاول مرة أخرى.'}};
-fin=function(){if(op==cur){cur++;try{localStorage.setItem('bsStage',cur)}catch(e){}}closeM();render();if(cur>=4&&!U.done){U.done=true;U.end=Date.now();save();modal('🎓 أتممت الرحلة',`<p>أحسنت يا ${esc(U.name)}!</p><p>درجتك: <b>${U.score} / 40</b> — الزمن: <b>${fmt(U.end-U.start)}</b></p>`)}else if(cur<4)go()};
+fin=function(){if(op==cur){cur++;try{localStorage.setItem('bsStage',cur)}catch(e){}}closeM();render();if(cur>=4&&!U.done){U.done=true;U.end=Date.now();save();modal('🎓 أتممت الرحلة',`<p>أحسنت يا ${esc(U.name)}!</p><p>درجتك: <b>${U.score} / 120</b> — الزمن: <b>${fmt(U.end-U.start)}</b></p>`)}else if(cur<4)go()};
 function save(){try{localStorage.setItem('bsUser',JSON.stringify(U))}catch(e){}if(U.done)pub()}
 function pub(){var e={id:U.id,name:U.name,score:U.score,time:U.end-U.start};try{var a=JSON.parse(localStorage.getItem('bsLB')||'[]').filter(function(x){return x.id!=e.id});a.push(e);localStorage.setItem('bsLB',JSON.stringify(a))}catch(x){}if(DB)DB.collection('scores').doc(e.id).set(e).catch(function(){});lbR()}
 function rows(){var m={};RW.forEach(function(r){if(r&&r.id)m[r.id]=r});try{JSON.parse(localStorage.getItem('bsLB')||'[]').forEach(function(r){m[r.id]=r})}catch(e){}return Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){return (Number(b.score)||0)-(Number(a.score)||0)||(Number(a.time)||0)-(Number(b.time)||0)})}
-function lbR(){var r=rows(),me=U?`<div class='me'>👤 ${esc(U.name)}<br>⭐ ${U.score} / 40 &nbsp; ⏱ <span id='tm'>${fmt((U.done?U.end:Date.now())-U.start)}</span></div>`:'';$('lb').innerHTML=`<h4>🏆 لوحة المتصدرين</h4>`+me+(r.length?`<ol class='lbl'>`+r.slice(0,15).map(function(x,i){return `<li><span>${['🥇','🥈','🥉'][i]||(i+1)}</span><b>${esc(x.name)}</b><i>${Number(x.score)||0}</i><small>${fmt(Number(x.time))}</small></li>`}).join('')+`</ol>`:`<p style='font-size:13px;opacity:.8'>لا يوجد متصدرون بعد. كن أول من يُنهي الرحلة!</p>`)+`<button class='out' onclick='showReg()'>＋ طالب جديد</button>`}
+function lbR(){var r=rows(),me=U?`<div class='me'>👤 ${esc(U.name)}<br>⭐ ${U.score} / 120 &nbsp; ⏱ <span id='tm'>${fmt((U.done?U.end:Date.now())-U.start)}</span></div>`:'';$('lb').innerHTML=`<h4>🏆 لوحة المتصدرين</h4>`+me+(r.length?`<ol class='lbl'>`+r.slice(0,15).map(function(x,i){return `<li><span>${['🥇','🥈','🥉'][i]||(i+1)}</span><b>${esc(x.name)}</b><i>${Number(x.score)||0}</i><small>${fmt(Number(x.time))}</small></li>`}).join('')+`</ol>`:`<p style='font-size:13px;opacity:.8'>لا يوجد متصدرون بعد. كن أول من يُنهي الرحلة!</p>`)+`<button class='out' onclick='showReg()'>＋ طالب جديد</button>`}
 function showReg(){$('reg').style.display='flex';$('rn').value='';$('rn').focus()}
 function doReg(){var v=$('rn').value.trim();if(v.length<2){$('rn').focus();return}U={id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:v.slice(0,30),start:Date.now(),score:0,done:false,end:0};cur=0;AW={};try{localStorage.setItem('bsStage',0)}catch(e){}save();$('reg').style.display='none';render();lbR();go()}
 document.body.insertAdjacentHTML('beforeend',`<div id='reg' style='display:none;position:fixed;inset:0;z-index:60;background:#0A1C2Af2;align-items:center;justify-content:center;padding:16px'><div class='mb' style='text-align:center'><div style='font-size:48px'>🏰</div><h3 style='font-size:26px;margin:4px 0'>ذاكرة البوسعيد</h3><p>اكتب اسمك لتبدأ الرحلة. تُحسب درجتك والوقت الذي تستغرقه.</p><input id='rn' maxlength='30' placeholder='الاسم' style='width:100%;padding:12px;border-radius:10px;border:2px solid #d9a94a;font-family:inherit;font-size:16px;color:#12303d;background:#fff'><button class='b' style='background:#1f6b49;margin-top:14px' onclick='doReg()'>ابدأ الرحلة 🧭</button></div></div>`);
@@ -167,6 +167,406 @@ if(!U){cur=0;$('reg').style.display='flex'}
 setInterval(function(){var e=$('tm');if(e&&U&&!U.done)e.textContent=fmt(Date.now()-U.start)},1000);
 (async function(){try{DB=await claude.use('db');if(DB)DB.collection('scores').onSnapshot(function(s){RW=s.docs.map(function(d){return d.data()});lbR()},function(){DB=null;lbR()})}catch(e){}})();
 render();lbR();
+/* ===== v3: photos, characters, active buttons ===== */
+document.head.insertAdjacentHTML('beforeend','<style>.phw{position:relative;display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;overflow:hidden;background:#e8d5a8;border:2px solid var(--gold);flex:none;vertical-align:middle;margin-left:10px;font-size:22px}.phw img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.phw.big{width:140px;height:140px;border-radius:12px;margin:0 0 8px 14px;float:right;font-size:60px}.up{display:inline-block;margin-top:6px;padding:5px 14px;border:1px dashed #8a5a1a;border-radius:999px;font-size:12px;cursor:pointer;color:#5a3a12;background:#fff6}.opt{display:flex!important;align-items:center;gap:4px;flex-wrap:wrap}.ic{cursor:pointer;transition:.2s}.ic:hover{background:#d9a94a44}#mm{display:none}@media(max-width:900px){#mm{display:flex}}.pn li{cursor:pointer}.pn li:hover{background:#ffffff10}.res{padding:8px 0;border-bottom:1px solid #0002;font-size:14px;line-height:1.8}.mbtn{display:block;width:100%;margin:6px 0;padding:10px;border:1px solid var(--gold);border-radius:10px;background:#fffdf6;color:#12303d;font-family:inherit;cursor:pointer;text-align:right}.mbtn:hover{background:#f3e3b8}</style>');
+function phk(k){try{return localStorage.getItem('ph_'+k)}catch(e){return null}}
+function phImg(k,em,big){return '<span class="phw'+(big?' big':'')+'">'+em+'<img data-k="'+k+'" src="'+(phk(k)||('images/'+k+'.jpg'))+'" alt="" onerror="this.style.display=\'none\'" onload="this.style.display=\'\'"></span>'}
+function upl(inp,k){var f=inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);var d=c.toDataURL('image/jpeg',.8);try{localStorage.setItem('ph_'+k,d)}catch(e){alert('تعذر حفظ الصورة (المساحة ممتلئة)');return}Array.prototype.forEach.call(document.querySelectorAll('img[data-k="'+k+'"]'),function(x){x.src=d;x.style.display=''})};im.src=r.result};r.readAsDataURL(f)}
+var KP={'👤':'p','🧔':'p','📜':'d','🕰️':'e','📖':'n','⛵':'m'};
+box=function(it,ic,a){var pre=KP[ic]||'x';return it.map(function(x,i){var k=pre+(i+1);return '<button class="opt" onclick="sh(this,'+a+')">'+phImg(k,ic)+'<b>'+x[0]+'</b><small>'+x[1]+'</small></button><div hidden style="margin:0 8px 10px;overflow:hidden">'+phImg(k,ic,1)+'<p style="margin:0;font-size:14px;line-height:1.9">'+x[2]+'</p><label class="up">📷 اختر صورة<input type="file" accept="image/*" hidden onchange="upl(this,\''+k+'\')"></label></div>'}).join('')};
+C[2]=function(){return box(PP.map(function(p){return[p[0],p[1],p[2]]}),'🧔',1)+'<p class="src">لإظهار الصور لكل الطلاب: ارفعها إلى مجلد images في المستودع (الأسماء في الإعدادات ⚙️ ثم دليل الصور).</p>'+SRC};
+/* header buttons */
+(function(){var ic=document.querySelectorAll('.sr .ic');
+ if(ic[0]){ic[0].title='حسابي';ic[0].onclick=showMe}
+ if(ic[1]){ic[1].title='الإعدادات';ic[1].onclick=showSet}
+ var m=document.createElement('span');m.className='ic';m.id='mm';m.textContent='☰';m.onclick=showMenu;document.querySelector('.sr').appendChild(m);
+ var s=document.createElement('span');s.className='ic';s.textContent='🔍';s.title='بحث';s.onclick=function(){doSearch($('q').value)};document.querySelector('.sr').insertBefore(s,$('q').nextSibling);
+ var q=$('q'),nq=q.cloneNode(true);q.parentNode.replaceChild(nq,q);nq.addEventListener('keydown',function(e){if(e.key=='Enter')doSearch(this.value)});
+})();
+function showMe(){var u=U||{name:'—',score:0,start:Date.now()};modal('👤 حسابي','<p>الاسم: <b>'+esc(u.name)+'</b></p><p>الدرجة: <b>'+u.score+' / 120</b></p><p>المرحلة الحالية: <b>'+Math.min(cur+1,4)+' من 4</b></p><button class="mbtn" onclick="closeM();showReg()">＋ تسجيل طالب جديد</button><button class="mbtn" onclick="closeM();document.getElementById(\'lb\').scrollIntoView({behavior:\'smooth\'})">🏆 عرض لوحة المتصدرين</button>')}
+function showMenu(){modal('☰ القائمة',NAV.map(function(n,i){return '<button class="mbtn" onclick="closeM();navGo('+i+')">'+n+'</button>'}).join(''))}
+var FS=1;
+function showSet(){modal('⚙️ الإعدادات','<button class="mbtn" onclick="fsz(.1)">🔠 تكبير الخط</button><button class="mbtn" onclick="fsz(-.1)">🔡 تصغير الخط</button><button class="mbtn" onclick="rstJ()">🔄 إعادة الرحلة من البداية للطالب الحالي</button><button class="mbtn" onclick="clrLB()">🧹 مسح لوحة المتصدرين على هذا الجهاز</button><button class="mbtn" onclick="clrPh()">🗑️ حذف الصور المرفوعة على هذا الجهاز</button><button class="mbtn" onclick="phGuide()">📷 دليل أسماء الصور</button>')}
+function fsz(d){FS=Math.min(1.4,Math.max(.8,FS+d));document.documentElement.style.fontSize=(FS*100)+'%'}
+function rstJ(){if(!U){closeM();return}if(!confirm('سيبدأ الطالب من المرحلة الأولى بدرجة صفر. متابعة؟'))return;cur=0;AW={};U.score=0;U.done=false;U.end=0;U.start=Date.now();try{localStorage.setItem('bsStage',0)}catch(e){}save();closeM();render();lbR()}
+function clrLB(){if(!confirm('مسح لوحة المتصدرين المحفوظة على هذا الجهاز؟'))return;try{localStorage.removeItem('bsLB')}catch(e){}lbR();closeM()}
+function clrPh(){if(!confirm('حذف كل الصور المرفوعة محلياً؟'))return;try{Object.keys(localStorage).filter(function(k){return k.indexOf('ph_')==0}).forEach(function(k){localStorage.removeItem(k)})}catch(e){}closeM();location.reload()}
+function phGuide(){modal('📷 دليل أسماء الصور','<p style="font-size:14px;line-height:1.9">ارفع الصور إلى مجلد <b>images</b> في المستودع (Add file ← Upload files) بصيغة jpg وبهذه الأسماء:</p>'+'<p style="font-size:13px;line-height:2"><b>الشخصيات:</b><br>'+PP.map(function(p,i){return 'p'+(i+1)+'.jpg ← '+p[0]}).join('<br>')+'</p><p style="font-size:13px;line-height:2"><b>الوثائق:</b> d1.jpg, d2.jpg, d3.jpg<br><b>الأحداث:</b> e1.jpg ... e9.jpg<br><b>الموسوعة الحية:</b> n1.jpg ... n4.jpg</p><p class="src">استخدم صوراً تملك حق استخدامها أو مرخصة (مثل ويكيميديا كومنز).</p>')}
+/* search */
+function doSearch(v){v=(v||'').trim();if(!v)return;var R=[];PP.forEach(function(p){R.push(['🧔 '+p[0],p[1]+' — '+p[2]])});EV.forEach(function(e){R.push(['🕰️ '+e[1],e[0]+' — '+e[2]])});PL.forEach(function(p){R.push(['📍 '+p[0],p[3]])});TL.forEach(function(t){R.push(['🔗 '+t[0],t[1]+' — '+t[3]])});var r=R.filter(function(x){return (x[0]+x[1]).indexOf(v)>-1}).slice(0,12);modal('🔍 نتائج البحث عن «'+esc(v)+'»',r.length?r.map(function(x){return '<div class="res"><b>'+x[0]+'</b><br>'+x[1]+'</div>'}).join(''):'<p>لا توجد نتائج.</p>')}
+/* learn items + memory strand + Esc */
+var LD=['ستتعرف على تأسيس الدولة البوسعيدية سنة 1744م وأبرز مراحلها.','ستتصفح شخصيات الحكم والأحداث والمواقع من خلال المراحل الأربع.','ستتدرب على مقارنة المعلومات والتحقق من المصادر قبل اعتمادها.','ستربط أحداث الماضي بما تراه حولك اليوم في عُمان.','ستنتج ملخصاً أو عرضاً رقمياً يعتمد على مصادر موثقة.'];
+Array.prototype.forEach.call(document.querySelectorAll('#learn li'),function(li,i){li.onclick=function(){modal(li.lastChild.textContent,'<p style="line-height:1.9">'+LD[i]+'</p>')}});
+var mi=document.querySelector('.mem img');if(mi){mi.style.cursor='pointer';mi.onclick=go}
+document.addEventListener('keydown',function(e){if(e.key=='Escape')closeM()});
+render();
+
+/* ===== v4: real photos (Wikimedia Commons) + rich visible content ===== */
+var WM='https://commons.wikimedia.org/wiki/Special:FilePath/';
+function wmU(f,w){return WM+encodeURIComponent(f)+'?width='+(w||600)}
+function pic(f,e,cls,w){return '<span class="pic '+(cls||'')+'" data-e="'+e+'"><img loading="lazy" src="'+wmU(f,w)+'" alt="" onerror="this.parentNode.classList.add(\'noimg\');this.remove()"></span>'}
+document.head.insertAdjacentHTML('beforeend',`<style>
+.sec{margin:26px 0 8px;scroll-margin-top:80px}.sec h2{font-family:Tajawal;font-weight:800;font-size:clamp(22px,3vw,30px);color:#f3d28a;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+.sec h2:after{content:"";flex:1;height:2px;background:linear-gradient(90deg,transparent,#d9a94a88)}.sec>p.lead{margin:0 0 14px;opacity:.85;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.gc{background:var(--paper);color:var(--ink);border:2px solid #e7d4a8;border-radius:12px;overflow:hidden;cursor:pointer;transition:.25s;display:flex;flex-direction:column}
+.gc:hover{transform:translateY(-4px);box-shadow:0 0 22px 3px #d9a94a99;border-color:var(--gold)}
+.gc .pic{height:170px}.gc .tx{padding:10px 12px 12px}.gc b{display:block;font-size:16px;font-weight:800}.gc small{display:block;color:#8a5a1a;font-weight:700;font-size:12px;margin:2px 0 6px}.gc p{margin:0;font-size:13px;line-height:1.7;color:#33434d}
+.pic{position:relative;display:block;overflow:hidden;background:linear-gradient(135deg,#3b2a18,#c28a3a)}.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic.top img{object-position:top}.pic.noimg:before{content:attr(data-e);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:58px}
+.mpic{height:280px;border-radius:10px;margin-bottom:12px;border:2px solid var(--gold)}.mpic img{object-fit:contain;background:#1a1a1a}
+.cr{font-size:11px;opacity:.65;margin-top:-6px;margin-bottom:10px}
+.vt{position:relative;padding-right:26px}.vt:before{content:"";position:absolute;right:9px;top:0;bottom:0;width:3px;background:linear-gradient(#d9a94a,#d9a94a33)}
+.ve{position:relative;background:#0d2a36;border:1px solid #d9a94a44;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:.2s}
+.ve:hover{border-color:var(--gold);background:#123545}.ve:before{content:"";position:absolute;right:-23px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px #0A1C2A}
+.ve .y{flex:none;min-width:74px;text-align:center;font-weight:800;color:#0A1C2A;background:#f0cf8e;border-radius:999px;padding:4px 10px;font-size:14px}
+.ve .pic{flex:none;width:70px;height:70px;border-radius:10px}.ve b{display:block;font-size:15px}.ve p{margin:2px 0 0;font-size:13px;opacity:.85;line-height:1.7}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}.fact{background:linear-gradient(135deg,#ecd9ae,#cfae75);color:#3b2a1c;border-radius:12px;padding:14px;font-size:14px;line-height:1.8}.fact b{display:block;font-size:22px}
+.it{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #0001}.it .pic{flex:none;width:96px;height:96px;border-radius:10px}.it b{display:block}.it small{color:#8a5a1a;font-weight:700}.it p{margin:4px 0 0;font-size:14px;line-height:1.8}
+.chip{display:inline-block;background:#d9a94a33;border:1px solid #d9a94a88;border-radius:999px;padding:2px 10px;font-size:12px;margin:2px}
+</style>`);
+/* ---------- DATA ---------- */
+var PEOPLE=[
+['الإمام أحمد بن سعيد البوسعيدي','1744 – 1783م','Al_Rustaq_Fort_05.jpg','🏰','المؤسس','وُلد في أدم، وكان والياً على صحار في أواخر عهد اليعاربة. برز في مقاومة الغزو الفارسي وإخراج القوات الفارسية من عُمان، فبايعه العُمانيون إماماً سنة 1744م، فكان مؤسس الدولة البوسعيدية. اتخذ الرستاق مقراً لحكمه، وبنى أسطولاً بحرياً قوياً، ومن أشهر مواقفه إرسال أسطول لنجدة البصرة حين حاصرها الفرس سنة 1775م. توفي في الرستاق سنة 1783م.','الصورة: قلعة الرستاق، مقر حكم الإمام'],
+['السيد حمد بن سعيد','ت 1792م','Fort_al-Jalali_in_Muscat,_Oman.jpg','🏯','نقل الحكم إلى مسقط','حفيد الإمام المؤسس. تولّى زمام الأمور في حياة أبيه السيد سعيد بن أحمد، ونقل مركز الحكم من الرستاق إلى مسقط على الساحل، فصارت مسقط عاصمة الدولة ومركز تجارتها البحرية. عُرف بجولاته السنوية لتفقّد أحوال الناس.','الصورة: قلعة الجلالي في مسقط'],
+['السيد سلطان بن أحمد','1792 – 1804م','Dhow_boat_Zanzibar.jpg','⛵','القوة البحرية','ابن الإمام المؤسس. قوّى الأسطول العُماني ووسّع نفوذ الدولة في الخليج وبحر العرب، وآلت إليه جوادر على ساحل مكران سنة 1784م فبقيت تابعة لعُمان قرابة قرنين. توفي سنة 1804م في أثناء عودته من رحلة بحرية.','الصورة: سفينة شراعية تقليدية (داو)'],
+['السيد سعيد بن سلطان','1806 – 1856م','Said_bin_Sultan.jpg','👑','الإمبراطورية البحرية','من أطول حكّام عُمان عهداً. امتدت دولته من سواحل عُمان إلى شرقي أفريقيا، واتخذ زنجبار عاصمة ثانية واستقر فيها منذ نحو 1840م، وشجّع فيها زراعة القرنفل حتى صارت من أكبر منتجيه في العالم. عقد معاهدة صداقة وتجارة مع الولايات المتحدة سنة 1833م، وأرسل السفينة «سلطانة» إلى نيويورك سنة 1840م. توفي سنة 1856م على متن سفينته في المحيط الهندي.','الصورة: ويكيميديا كومنز'],
+['أحمد بن نعمان الكعبي','مبعوث 1840م','Ahmad_bin_Naaman_Al_Kaabi.jpg','🧭','أول مبعوث عربي إلى أمريكا','مبعوث السيد سعيد بن سلطان على متن السفينة «سلطانة» التي وصلت ميناء نيويورك سنة 1840م محمّلة بالهدايا والبضائع، ويُعدّ أول مبعوث عربي يزور الولايات المتحدة. رُسمت له صورة زيتية في أثناء زيارته.','الصورة: لوحة زيتية، ويكيميديا كومنز'],
+['السلطان ثويني بن سعيد','1856 – 1866م','Thuwaini_bin_Said.jpg','👤','حاكم مسقط','تولّى حكم مسقط وعُمان بعد وفاة أبيه، بينما حكم أخوه ماجد زنجبار. وبتحكيم اللورد كانينغ نائب الملك في الهند سنة 1861م انفصلت زنجبار عن عُمان، على أن تدفع زنجبار إعانة سنوية لمسقط.','الصورة: ويكيميديا كومنز'],
+['السلطان ماجد بن سعيد','زنجبار 1856 – 1870م','Sultan_Majid_bin_Said.jpg','👤','أول سلطان لزنجبار','ابن السيد سعيد بن سلطان، وأول سلطان لزنجبار بعد انفصالها عن عُمان. أسّس مدينة دار السلام على الساحل الأفريقي في ستينيات القرن التاسع عشر.','الصورة: ويكيميديا كومنز'],
+['السلطان تركي بن سعيد','1871 – 1888م','Turki_ibn_Said.jpg','👤','إعادة الاستقرار','تولّى الحكم بعد فترة من الاضطرابات الداخلية، وعمل على إعادة الاستقرار إلى البلاد وتثبيت حكم الأسرة في مسقط.','الصورة: ويكيميديا كومنز'],
+['السلطان فيصل بن تركي','1888 – 1913م','Faysal_bin_Turki.jpg','👤','مطلع القرن العشرين','حكم ربع قرن، وواجه تحديات اقتصادية وسياسية مع تراجع التجارة البحرية وتزايد التنافس الدولي في المنطقة.','الصورة: ويكيميديا كومنز'],
+['السلطان تيمور بن فيصل','1913 – 1932م','Taimur_bin_Feisal.png','👤','معاهدة السيب','شهد عهده توقيع معاهدة السيب سنة 1920م التي نظّمت العلاقة بين السلطنة في مسقط وزعماء الداخل. تنازل عن الحكم لابنه سعيد سنة 1932م.','الصورة: ويكيميديا كومنز'],
+['السلطان سعيد بن تيمور','1932 – 1970م','Said_bin_Taimur_(cropped).png','👤','توحيد البلاد','حكم 38 عاماً، وشهد عهده توحيد الساحل والداخل تحت سلطة واحدة، والتنازل عن جوادر لباكستان سنة 1958م، وبدء تصدير النفط سنة 1967م.','الصورة: ويكيميديا كومنز'],
+['السلطان قابوس بن سعيد','1970 – 2020م','Official_portrait_of_Sultan_Qaboos_bin_Said_(cropped).jpg','👑','قائد النهضة','وُلد في صلالة سنة 1940م، وتولّى الحكم في 23 يوليو 1970م فقاد النهضة العُمانية الحديثة: المدارس والمستشفيات والطرق ومؤسسات الدولة. أصدر النظام الأساسي للدولة سنة 1996م، وعُرف بسياسة الحياد والسلام. توفي في 10 يناير 2020م.','الصورة: الصورة الرسمية، ويكيميديا كومنز'],
+['السلطان هيثم بن طارق','2020م – الآن','Haitham_bin_Tariq_Al_Said.jpg','👑','النهضة المتجددة','سلطان عُمان الحالي، تولّى الحكم في 11 يناير 2020م. ترأّس قبل توليه لجنة «رؤية عُمان 2040»، ويقود اليوم تنفيذها. في عهده أُعلن 20 نوفمبر يوماً وطنياً للسلطنة تخليداً لتأسيس الدولة البوسعيدية.','الصورة: ويكيميديا كومنز']];
+var FORTS=[
+['قلعة نزوى','القرن 17م','Nizwa_Fort_-_Oman.jpg','بناها الإمام سلطان بن سيف اليعربي واكتمل بناؤها نحو 1668م، وتشتهر ببرجها الدائري الضخم الذي يُعدّ من أكبر الأبراج في عُمان. كانت نزوى عاصمة للعلم والحكم في الداخل.'],
+['حصن جبرين','نحو 1670م','Jabrin37.jpg','بناه الإمام بلعرب بن سلطان اليعربي ليكون قصراً ومركزاً للعلم، ويشتهر بسقوفه الخشبية المزخرفة ونقوشه البديعة.'],
+['قلعة بهلاء','تراث عالمي','Bahla_Fort_-_Oman.jpg','من أقدم القلاع العُمانية وأضخمها، أُدرجت في قائمة التراث العالمي لليونسكو سنة 1987م، ويحيط بالمدينة سور طويل.'],
+['قلعة الرستاق','مقر الإمام المؤسس','Al_Rustaq_Fort_05.jpg','كانت مقراً للحكم في عهد الإمام أحمد بن سعيد البوسعيدي، وفيها تُوفي سنة 1783م.'],
+['قلعة الجلالي','ميناء مسقط','Fort_al-Jalali_in_Muscat,_Oman.jpg','تحرس مع قلعة الميراني مدخل ميناء مسقط القديم، وشُيّدت في عهد البرتغاليين في القرن السادس عشر، ثم صارت من حصون الدولة العُمانية.'],
+['قلعة مطرح','ميناء مطرح','Fort_Mutrah_in_Muscat,_Oman.jpg','تطل على ميناء مطرح وسوقه الشهير، وبُنيت في ثمانينيات القرن السادس عشر لحماية الميناء.'],
+['قلعة صحار (1940م)','صورة تاريخية','Sohar_Fort_in_1940.jpg','صورة نادرة لقلعة صحار سنة 1940م. صحار هي المدينة التي كان الإمام أحمد بن سعيد والياً عليها قبل تأسيس الدولة.'],
+['بيت الزبير','متحف','Bait_al_Zubair-Muscat.jpg','متحف في مسقط القديمة يعرض الأزياء والأسلحة والحُلي والأدوات العُمانية التقليدية.']];
+var SEA=[
+['السفينة «سلطانة»','1840م','Ahmad_bin_Naaman_Al_Kaabi.jpg','🚢','أبحرت من زنجبار إلى نيويورك سنة 1840م بقيادة المبعوث أحمد بن نعمان الكعبي، فكانت أول سفينة عربية تصل إلى الولايات المتحدة، وحملت هدايا من السيد سعيد بن سلطان إلى الرئيس الأمريكي.'],
+['زنجبار وبيت العجائب','شرقي أفريقيا','Beit_al_Ajaib,_Zanzibar.jpg','🏛️','صارت زنجبار عاصمة ثانية للدولة في عهد السيد سعيد بن سلطان. وبيت العجائب قصر بناه السلطان برغش بن سعيد سنة 1883م، وكان أول مبنى في شرقي أفريقيا يُضاء بالكهرباء.'],
+['السفن العُمانية التقليدية','الداو','Dhow_boat_Zanzibar.jpg','⛵','اعتمد العُمانيون على السفن الشراعية الخشبية في تجارتهم مع الهند وشرقي أفريقيا، مستفيدين من الرياح الموسمية التي تهب في اتجاهين بحسب الفصول.'],
+['جوهرة مسقط','2010م','Jewel_of_Muscat,_Maritime_Experiential_Museum_&_Aquarium,_Singapore_-_20120102-02.jpg','🛶','سفينة بُنيت بالطريقة التقليدية؛ ألواحها مخيطة بالحبال دون مسامير، محاكاةً لسفينة من القرن التاسع الميلادي، وأبحرت من مسقط إلى سنغافورة سنة 2010م.'],
+['خريطة المنطقة (1870م)','وثيقة خرائطية','Oman._1870_Johnson_Map_of_Turkey,_Persia,_Arabia_(_Iran,_Iraq,_Afghanistan_)_-_Geographicus_-_TurkeyPersiaArabia-johnson-1870_(cropped).jpg','🗺️','خريطة تاريخية تُظهر عُمان وسواحلها في القرن التاسع عشر، حين كانت الدولة البوسعيدية قوة بحرية في الخليج وبحر العرب.'],
+['مسندم والسفن الشراعية','الساحل الشمالي','Musandam_banner_Dhows_cruising.jpg','🌊','تطل مسندم على مضيق هرمز، أحد أهم الممرات البحرية في العالم، ولا تزال السفن الشراعية تجوب خلجانها.']];
+var EV2=[
+['1744م','تأسيس الدولة البوسعيدية','بيعة الإمام أحمد بن سعيد إماماً لعُمان بعد إخراج القوات الفارسية.','Al_Rustaq_Fort_05.jpg'],
+['1775م','نجدة البصرة','أرسل الإمام أحمد أسطولاً لنجدة البصرة حين حاصرها الفرس.','Dhow_boat_Zanzibar.jpg'],
+['1784م','جوادر','آلت جوادر على ساحل مكران إلى السيد سلطان بن أحمد.',''],
+['أواخر ق18','مسقط عاصمة','نقل السيد حمد بن سعيد مركز الحكم من الرستاق إلى مسقط.','Fort_al-Jalali_in_Muscat,_Oman.jpg'],
+['1806م','عهد سعيد بن سلطان','بداية عهد امتد نصف قرن وبلغت فيه الدولة أوج قوتها البحرية.','Said_bin_Sultan.jpg'],
+['1833م','معاهدة مع أمريكا','معاهدة صداقة وتجارة بين السيد سعيد بن سلطان والولايات المتحدة.',''],
+['1840م','سلطانة في نيويورك','وصول السفينة «سلطانة» ومبعوثها أحمد بن نعمان الكعبي إلى نيويورك.','Ahmad_bin_Naaman_Al_Kaabi.jpg'],
+['1856م','وفاة السيد سعيد','تولّى ثويني حكم مسقط وماجد حكم زنجبار.','Thuwaini_bin_Said.jpg'],
+['1861م','تحكيم كانينغ','إقرار انفصال زنجبار عن عُمان مقابل إعانة سنوية.','Sultan_Majid_bin_Said.jpg'],
+['1883م','بيت العجائب','بناء قصر بيت العجائب في زنجبار في عهد السلطان برغش.','Beit_al_Ajaib,_Zanzibar.jpg'],
+['1920م','معاهدة السيب','تنظيم العلاقة بين السلطنة وزعماء الداخل في عهد السلطان تيمور.','Taimur_bin_Feisal.png'],
+['1958م','التنازل عن جوادر','انتقلت جوادر إلى باكستان في عهد السلطان سعيد بن تيمور.','Said_bin_Taimur_(cropped).png'],
+['1967م','تصدير النفط','بدء تصدير النفط العُماني.',''],
+['1970م','النهضة','تولّي السلطان قابوس الحكم في 23 يوليو وبدء بناء الدولة الحديثة.','Official_portrait_of_Sultan_Qaboos_bin_Said_(cropped).jpg'],
+['1996م','النظام الأساسي','صدور النظام الأساسي للدولة.',''],
+['2020م','النهضة المتجددة','تولّي السلطان هيثم بن طارق الحكم في 11 يناير.','Haitham_bin_Tariq_Al_Said.jpg']];
+var FACTS=[['281','عاماً مرّت على تأسيس الدولة البوسعيدية سنة 2025م.'],['50','عاماً تقريباً حكم السيد سعيد بن سلطان، من أطول العهود في تاريخ عُمان.'],['1840','وصلت السفينة «سلطانة» إلى نيويورك كأول سفينة عربية هناك.'],['20 نوفمبر','اليوم الوطني لسلطنة عُمان، ذكرى تأسيس الدولة سنة 1744م.'],['1987','أُدرجت قلعة بهلاء في قائمة التراث العالمي لليونسكو.'],['0 مسامير','في سفينة «جوهرة مسقط»؛ ألواحها مخيطة بالحبال.']];
+/* ---------- MODALS ---------- */
+function pModal(i){var p=PEOPLE[i];modal(p[0],pic(p[2],p[3],'mpic'+(p[2].match(/bin|ibn|portrait|Haitham|Naaman/)?' top':''),900)+'<p class="cr">'+p[6]+'</p><p><span class="chip">'+p[1]+'</span><span class="chip">'+p[4]+'</span></p><p style="line-height:2;font-size:15px">'+p[5]+'</p>')}
+function fModal(i){var f=FORTS[i];modal(f[0],pic(f[2],'🏰','mpic',900)+'<p class="cr">الصورة: ويكيميديا كومنز</p><p><span class="chip">'+f[1]+'</span></p><p style="line-height:2;font-size:15px">'+f[3]+'</p>')}
+function sModal(i){var s=SEA[i];modal(s[0],pic(s[2],s[3],'mpic',900)+'<p class="cr">الصورة: ويكيميديا كومنز</p><p><span class="chip">'+s[1]+'</span></p><p style="line-height:2;font-size:15px">'+s[4]+'</p>')}
+function eModal(i){var e=EV2[i];modal(e[0]+' — '+e[1],(e[3]?pic(e[3],'🕰️','mpic',900):'')+'<p style="line-height:2;font-size:15px">'+e[2]+'</p>')}
+/* ---------- VISIBLE SECTIONS ---------- */
+var secH='<section class="sec rv" id="sec-people"><h2>👤 شخصيات صنعت التاريخ</h2><p class="lead">حكّام الدولة البوسعيدية وأعلامها منذ 1744م حتى اليوم. اضغط على أي شخصية لقراءة قصتها.</p><div class="grid">'+PEOPLE.map(function(p,i){return '<div class="gc" onclick="pModal('+i+')">'+pic(p[2],p[3],p[2].match(/bin|ibn|portrait|Haitham|Naaman/)?'top':'',400)+'<div class="tx"><b>'+p[0]+'</b><small>'+p[1]+' · '+p[4]+'</small><p>'+p[5].slice(0,90)+'…</p></div></div>'}).join('')+'</div></section>'
++'<section class="sec rv" id="sec-forts"><h2>🏰 قلاع وحصون عُمانية</h2><p class="lead">شواهد حيّة على تاريخ عُمان وقوتها، من الداخل إلى الساحل.</p><div class="grid">'+FORTS.map(function(f,i){return '<div class="gc" onclick="fModal('+i+')">'+pic(f[2],'🏰','',400)+'<div class="tx"><b>'+f[0]+'</b><small>'+f[1]+'</small><p>'+f[3].slice(0,85)+'…</p></div></div>'}).join('')+'</div></section>'
++'<section class="sec rv" id="sec-sea"><h2>⛵ عُمان عبر البحر</h2><p class="lead">من مسقط إلى زنجبار ونيويورك: كيف صنع البحر مجد الدولة البوسعيدية.</p><div class="grid">'+SEA.map(function(s,i){return '<div class="gc" onclick="sModal('+i+')">'+pic(s[2],s[3],s[2].match(/Naaman/)?'top':'',400)+'<div class="tx"><b>'+s[0]+'</b><small>'+s[1]+'</small><p>'+s[4].slice(0,85)+'…</p></div></div>'}).join('')+'</div></section>'
++'<section class="sec rv" id="sec-tl"><h2>🕰️ الخط الزمني المفصّل</h2><p class="lead">أبرز محطات الدولة البوسعيدية بالترتيب الزمني.</p><div class="vt">'+EV2.map(function(e,i){return '<div class="ve" onclick="eModal('+i+')"><span class="y">'+e[0]+'</span>'+(e[3]?pic(e[3],'🕰️','',160):'')+'<div><b>'+e[1]+'</b><p>'+e[2]+'</p></div></div>'}).join('')+'</div></section>'
++'<section class="sec rv" id="sec-facts"><h2>💡 هل تعلم؟</h2><div class="facts">'+FACTS.map(function(f){return '<div class="fact"><b>'+f[0]+'</b>'+f[1]+'</div>'}).join('')+'</div><p class="src" style="color:#f3e7cc">الصور من ويكيميديا كومنز بتراخيص حرة. المعلومات من وكالة الأنباء العُمانية وجريدة عُمان ومصادر تاريخية عامة؛ يُنصح بمراجعتها مع الموسوعة العُمانية.</p></section>';
+document.getElementById('bot').insertAdjacentHTML('afterend',secH);
+Array.prototype.forEach.call(document.querySelectorAll('.sec.rv'),function(e){io.observe(e)});
+/* ---------- STAGE CONTENT WITH PHOTOS ---------- */
+function items(arr,fn){return arr.map(fn).join('')}
+C[0]=function(){return '<p><b>📜 وثائق وصور تاريخية</b></p>'+
+'<div class="it">'+pic('Sohar_Fort_in_1940.jpg','📷','',200)+'<div><b>صورة قلعة صحار سنة 1940م</b><small>صورة تاريخية</small><p>صحار هي المدينة التي كان الإمام أحمد بن سعيد والياً عليها قبل أن يُبايَع إماماً سنة 1744م.</p></div></div>'+
+'<div class="it">'+pic('Oman._1870_Johnson_Map_of_Turkey,_Persia,_Arabia_(_Iran,_Iraq,_Afghanistan_)_-_Geographicus_-_TurkeyPersiaArabia-johnson-1870_(cropped).jpg','🗺️','',200)+'<div><b>خريطة المنطقة سنة 1870م</b><small>وثيقة خرائطية</small><p>تُظهر سواحل عُمان ومسقط في القرن التاسع عشر.</p></div></div>'+
+'<div class="it">'+pic('Ahmad_bin_Naaman_Al_Kaabi.jpg','🧭','top',200)+'<div><b>لوحة المبعوث أحمد بن نعمان الكعبي</b><small>نيويورك 1840م</small><p>رُسمت في أثناء زيارته على متن السفينة «سلطانة»، أول سفينة عربية تصل الولايات المتحدة.</p></div></div>'+
+'<div class="it"><span class="pic" data-e="📜" style="width:96px;height:96px;border-radius:10px"></span><div><b>عهد الإمام أحمد لرزيق بن بخيت</b><small>وثيقة تاريخية</small><p>كتب الإمام عهداً بأن يكون رزيق بن بخيت مسؤول الحساب في ميناء مسقط، ثم توارثه ابنه محمد وحفيده المؤرخ حميد بن رزيق صاحب كتاب «الفتح المبين في سيرة السادة البوسعيديين».</p></div></div>'+
+'<p style="margin-top:10px"><b>اختبر معلوماتك:</b> متى تأسست الدولة البوسعيدية؟</p>'+[['20 نوفمبر 1744م',1],['23 يوليو 1970م',0],['1856م',0]].map(function(o){return '<button class="opt" onclick="ans(this,'+o[1]+')">'+o[0]+'</button>'}).join('')+'<p id="fb"></p>'+SRC};
+var _m1=C[1];C[1]=function(){return items(SEA.slice(0,4),function(s){return '<div class="it">'+pic(s[2],s[3],s[2].match(/Naaman/)?'top':'',200)+'<div><b>'+s[0]+'</b><small>'+s[1]+'</small><p>'+s[4]+'</p></div></div>'})+'<p style="margin-top:12px"><b>🗺️ الخريطة التفاعلية</b></p>'+_m1()};
+C[2]=function(){return items(PEOPLE,function(p,i){return '<div class="it">'+pic(p[2],p[3],p[2].match(/bin|ibn|portrait|Haitham|Naaman/)?'top':'',200)+'<div><b>'+p[0]+'</b><small>'+p[1]+' · '+p[4]+'</small><p>'+p[5]+'</p></div></div>'})+SRC};
+C[3]=function(){return items(FORTS,function(f){return '<div class="it">'+pic(f[2],'🏰','',200)+'<div><b>'+f[0]+'</b><small>'+f[1]+'</small><p>'+f[3]+'</p></div></div>'})+'<div style="margin-top:10px">'+FACTS.map(function(f){return '<span class="chip">💡 '+f[0]+': '+f[1]+'</span>'}).join(' ')+'</div>'+SRC};
+showTL=function(){modal('الخط الزمني للدولة البوسعيدية',items(EV2,function(e){return '<div class="it">'+(e[3]?pic(e[3],'🕰️','',200):'<span class="pic noimg" data-e="🕰️" style="width:96px;height:96px;border-radius:10px"></span>')+'<div><b>'+e[0]+' — '+e[1]+'</b><p>'+e[2]+'</p></div></div>'}))};
+showEV=showTL;
+/* ---------- NAV → SECTIONS ---------- */
+function goSec(id){var e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
+navGo=function(i){var m={0:null,1:'sec-forts',2:'sec-tl',3:'sec-sea',4:'sec-people',5:'sec-tl',6:'sec-sea'};if(i==0)scrollTo({top:0,behavior:'smooth'});else goSec(m[i])};
+Array.prototype.forEach.call(document.querySelectorAll('#nav span'),function(s,i){s.onclick=function(){Array.prototype.forEach.call(document.querySelectorAll('#nav span'),function(x){x.classList.remove('on')});s.classList.add('on');navGo(i)}});
+/* timeline circles + search include new data */
+Array.prototype.forEach.call(document.querySelectorAll('#tl > div'),function(d){d.onclick=function(){goSec('sec-tl')}});
+var _ds=doSearch;doSearch=function(v){v=(v||'').trim();if(!v)return;var R=[];PEOPLE.forEach(function(p,i){R.push(['👤 '+p[0],p[1]+' — '+p[5],'pModal('+i+')'])});FORTS.forEach(function(f,i){R.push(['🏰 '+f[0],f[3],'fModal('+i+')'])});SEA.forEach(function(s,i){R.push(['⛵ '+s[0],s[4],'sModal('+i+')'])});EV2.forEach(function(e,i){R.push(['🕰️ '+e[0]+' '+e[1],e[2],'eModal('+i+')'])});var r=R.filter(function(x){return (x[0]+x[1]).indexOf(v)>-1}).slice(0,15);modal('🔍 نتائج البحث عن «'+esc(v)+'»',r.length?r.map(function(x){return '<div class="res" style="cursor:pointer" onclick="'+x[2]+'"><b>'+x[0]+'</b><br>'+x[1].slice(0,140)+'…</div>'}).join(''):'<p>لا توجد نتائج.</p>')};
+
+/* ===== v5: tabbed pages ===== */
+document.head.insertAdjacentHTML('beforeend',`<style>
+#tabban{display:none;position:relative;height:150px;border-radius:14px;overflow:hidden;margin:16px 0 4px;border:2px solid #d9a94a66;background-size:cover;background-position:center}
+#tabban:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0A1C2Aee,#0A1C2A88 60%,#0A1C2A44)}
+#tabban div{position:relative;padding:26px 24px}#tabban h1{margin:0;font-weight:800;font-size:clamp(26px,4vw,40px);color:#f3d28a}#tabban p{margin:6px 0 0;max-width:620px;font-size:14px;opacity:.9}
+#tabban button{position:absolute;left:16px;bottom:14px;background:#0b2f3c;color:#f3d28a;border:1px solid #d9a94a;border-radius:999px;padding:6px 16px;font-family:inherit;cursor:pointer}
+#tabstrip{display:none;gap:6px;overflow-x:auto;padding:8px 12px;background:#0b2530;border-bottom:1px solid #d9a94a33;position:sticky;top:50px;z-index:29}
+#tabstrip span{flex:none;padding:6px 14px;border-radius:999px;font-size:13px;background:#0d2f3b;cursor:pointer;white-space:nowrap}#tabstrip span.on{background:#f0cf8e;color:#0A1C2A;font-weight:800}
+@media(max-width:900px){#tabstrip{display:flex}}.hd{flex-wrap:nowrap}@media(max-width:560px){.hd{gap:6px;padding:6px 8px}.logo img{height:32px!important}.logo b{font-size:16px!important;white-space:nowrap}.logo small{display:none}.sr{gap:4px}.sr input{width:70px!important;padding:6px 8px}.ic{width:30px;height:30px}#tabstrip{top:44px}}
+.tabpane{animation:tfade .45s ease}@keyframes tfade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.mapbox{background:var(--paper);color:var(--ink);border-radius:12px;padding:12px;border:2px solid #e7d4a8}
+</style>`);
+var TABS=[
+['home','الرئيسية','',null],
+['enc','الموسوعة الحية','معلومات موثقة عن معالم عُمان وقلاعها وحصونها، مع حقائق سريعة عن الدولة البوسعيدية.',['sec-forts','sec-facts']],
+['tl','التسلسل الزمني','رحلة عبر الزمن من تأسيس الدولة البوسعيدية سنة 1744م حتى اليوم.',['sec-tl']],
+['map','الخريطة التفاعلية','المواقع والمسارات البحرية التي صنعت مجد الدولة البوسعيدية، من مسقط إلى زنجبار.',['sec-map','sec-sea']],
+['people','الشخصيات','أئمة وسلاطين وأعلام الدولة البوسعيدية، وقصة كل واحد منهم.',['sec-people']],
+['ev','الأحداث','أبرز الأحداث التي غيّرت مسار التاريخ العُماني.',['sec-ev']],
+['docs','الوثائق','وثائق وصور وخرائط تاريخية تفتح لك أبواب الاستكشاف والتحليل.',['sec-docs']]];
+var DOCS=[
+['قلعة صحار سنة 1940م','صورة فوتوغرافية','Sohar_Fort_in_1940.jpg','📷','صورة نادرة لقلعة صحار في منتصف القرن العشرين. صحار هي المدينة التي كان الإمام أحمد بن سعيد والياً عليها قبل أن يُبايَع إماماً سنة 1744م.'],
+['خريطة المنطقة سنة 1870م','خريطة تاريخية','Oman._1870_Johnson_Map_of_Turkey,_Persia,_Arabia_(_Iran,_Iraq,_Afghanistan_)_-_Geographicus_-_TurkeyPersiaArabia-johnson-1870_(cropped).jpg','🗺️','خريطة من القرن التاسع عشر تُظهر سواحل عُمان ومسقط وموقعها على طرق التجارة البحرية.'],
+['خريطة قديمة لمسقط','خريطة تاريخية','Muscat_map_old.jpg','🗺️','خريطة قديمة لمدينة مسقط ومينائها المحمي بالجبال والقلاع.'],
+['لوحة المبعوث أحمد بن نعمان الكعبي','نيويورك 1840م','Ahmad_bin_Naaman_Al_Kaabi.jpg','🖼️','لوحة زيتية رُسمت للمبعوث العُماني في أثناء زيارته نيويورك على متن السفينة «سلطانة» سنة 1840م.'],
+['بيت العجائب في ثمانينيات القرن 19','صورة فوتوغرافية','Beit_el-Ajaib_(House_of_Wonders),_1880s,_Stone_Town,_Zanzibar_(8)_(29072181706).jpg','📷','صورة قديمة لقصر بيت العجائب في زنجبار بعد بنائه بقليل في عهد السلطان برغش بن سعيد.'],
+['السلطان سعيد بن تيمور سنة 1939م','صورة فوتوغرافية','Said_bin_Taimur_in_the_United_Kingdom_-_1939.jpg','📷','صورة للسلطان سعيد بن تيمور في أثناء زيارته المملكة المتحدة سنة 1939م.'],
+['وصية السلطان قابوس','وثيقة 2020م','Sultan_Qaboos\'s_Last_Will.jpg','📜','الوصية التي فُتحت بعد وفاة السلطان قابوس في يناير 2020م، وسمّى فيها السلطان هيثم بن طارق خلفاً له.'],
+['عهد الإمام أحمد لرزيق بن بخيت','وثيقة تاريخية','','📜','كتب الإمام أحمد بن سعيد عهداً بأن يكون رزيق بن بخيت مسؤول الحساب في ميناء مسقط، ثم توارثه ابنه محمد وحفيده المؤرخ حميد بن رزيق صاحب «الفتح المبين في سيرة السادة البوسعيديين».']];
+function dModal(i){var d=DOCS[i];modal(d[0],(d[2]?pic(d[2],d[3],'mpic',1000)+'<p class="cr">الصورة: ويكيميديا كومنز</p>':'')+'<p><span class="chip">'+d[1]+'</span></p><p style="line-height:2;font-size:15px">'+d[4]+'</p>')}
+function gcard(img,e,t,s,p,on,top){return '<div class="gc" onclick="'+on+'">'+(img?pic(img,e,top?'top':'',400):'<span class="pic noimg" data-e="'+e+'" style="height:170px"></span>')+'<div class="tx"><b>'+t+'</b><small>'+s+'</small><p>'+p+'</p></div></div>'}
+var more='<section class="sec" id="sec-ev"><h2>⚡ أحداث صنعت التاريخ</h2><p class="lead">اضغط على أي حدث لقراءة تفاصيله.</p><div class="grid">'+EV2.map(function(e,i){return gcard(e[3],'🕰️',e[1],e[0],e[2],'eModal('+i+')',/bin|ibn|portrait|Haitham|Naaman|Taimur/.test(e[3]))}).join('')+'</div></section>'
++'<section class="sec" id="sec-docs"><h2>📜 وثائق وصور تاريخية</h2><p class="lead">مصادر بصرية أصلية لتحليل التاريخ العُماني.</p><div class="grid">'+DOCS.map(function(d,i){return gcard(d[2],d[3],d[0],d[1],d[4].slice(0,90)+'…','dModal('+i+')',/Naaman|Taimur/.test(d[2]))}).join('')+'</div></section>'
++'<section class="sec" id="sec-map"><h2>🗺️ خريطة المواقع والمسارات</h2><p class="lead">الخطوط المنقطة تمثّل صلات مسقط البحرية والتجارية. اضغط على أي موقع.</p><div class="mapbox">'+mapH().replace(/pl\(/g,'pl2(').replace('id="mi"','id="mi2"')+'</div></section>';
+document.getElementById('sec-facts').insertAdjacentHTML('afterend',more);$('sec-sea').parentNode.insertBefore($('sec-map'),$('sec-sea'));
+function pl2(i){$('mi2').innerHTML='<b>📍 '+PL[i][0]+'</b><br>'+PL[i][3]}
+var mn=document.querySelector('.mn');mn.insertAdjacentHTML('afterbegin','<div id="tabban"><div><h1></h1><p></p></div><button onclick="showTab(\'home\')">↩ العودة للرئيسية</button></div>');
+var hb=getComputedStyle(document.querySelector('.hbg')).backgroundImage;$('tabban').style.backgroundImage=hb;
+document.querySelector('header').insertAdjacentHTML('afterend','<div id="tabstrip">'+TABS.map(function(t){return '<span data-k="'+t[0]+'" onclick="showTab(\''+t[0]+'\')">'+t[1]+'</span>'}).join('')+'</div>');
+var HOME=[document.querySelector('.hero'),$('stages'),$('bot')];
+var CUR='home';
+function showTab(k,noscroll){var t=TABS.filter(function(x){return x[0]==k})[0]||TABS[0];CUR=t[0];
+ HOME.forEach(function(e){e.style.display=t[3]?'none':''});
+ Array.prototype.forEach.call(document.querySelectorAll('.sec'),function(s){var on=t[3]&&t[3].indexOf(s.id)>-1;s.style.display=on?'':'none';s.classList.add('in');s.classList.remove('tabpane');if(on){void s.offsetWidth;s.classList.add('tabpane')}});
+ var b=$('tabban');b.style.display=t[3]?'block':'none';if(t[3]){b.querySelector('h1').textContent=t[1];b.querySelector('p').textContent=t[2]}
+ var i=TABS.indexOf(t);Array.prototype.forEach.call(document.querySelectorAll('#nav span'),function(x,j){x.classList.toggle('on',j==i)});
+ Array.prototype.forEach.call(document.querySelectorAll('#tabstrip span'),function(x){x.classList.toggle('on',x.getAttribute('data-k')==t[0])});
+ try{history.replaceState(null,'','#'+t[0])}catch(e){}
+ if(!noscroll)scrollTo({top:0,behavior:'smooth'})}
+navGo=function(i){showTab(TABS[i][0])};
+Array.prototype.forEach.call(document.querySelectorAll('#nav span'),function(s,i){s.onclick=function(){showTab(TABS[i][0])}});
+var _go=go;go=function(){if(CUR!='home'){showTab('home',1);setTimeout(_go,350)}else _go()};
+Array.prototype.forEach.call(document.querySelectorAll('#tl > div'),function(d){d.onclick=function(){showTab('tl')}});
+var _r2=render;render=function(){_r2();var i=TABS.map(function(t){return t[0]}).indexOf(CUR);Array.prototype.forEach.call(document.querySelectorAll('#nav span'),function(s,j){s.classList.toggle('on',j==i);s.onclick=function(){showTab(TABS[j][0])}})};
+/* search results in other tabs: open modal only, fine. */
+showTab((location.hash||'#home').slice(1),1);
+
+
+/* ===== v5.1: no accidental text selection on clicks ===== */
+document.head.insertAdjacentHTML('beforeend','<style>nav,nav span,#tabstrip,#tabstrip span,.ic,button,.b,.go,.out,.gc,.ve,.card,#tabban,.pn li,.tl,.tl div,.opt,.mbtn,.logo,.sec h2,.hero,header,.mem img,.lbl{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}::selection{background:#d9a94a55;color:inherit}input{-webkit-user-select:text;user-select:text}</style>');
+document.addEventListener('mousedown',function(e){if(e.detail>1&&!e.target.closest('input,textarea'))e.preventDefault()});
+var _st=showTab;showTab=function(k,n){try{getSelection().removeAllRanges()}catch(e){}_st(k,n)};
+
+
+/* ===== v5.2: home page fits one screen (desktop) ===== */
+document.head.insertAdjacentHTML('beforeend',`<style>
+@media (min-width:1000px) and (min-height:560px){
+body.homefit{height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body.homefit header{flex:none}
+body.homefit .hero{flex:none;height:25vh;min-height:150px}
+body.homefit .ht{padding-top:2.2vh}
+body.homefit .ht h1{font-size:6vh;line-height:1.1}
+body.homefit .ht h2{font-size:3.4vh;line-height:1.2}
+body.homefit .ht p{font-size:1.75vh;margin:.6vh auto}
+body.homefit .go{padding:.9vh 22px;font-size:1.9vh}
+body.homefit main.wrap{flex:1;min-height:0;width:100%;grid-template-columns:1fr 250px;gap:12px;padding-bottom:1.2vh}
+body.homefit .mn{display:flex;flex-direction:column;min-height:0;height:100%}
+body.homefit #stages{flex:none;margin-top:-1.4vh}
+body.homefit .art{height:12.5vh}
+body.homefit .cb{padding:.9vh 10px 1.1vh}
+body.homefit .cb h3{font-size:2.3vh;margin:0 0 .4vh}
+body.homefit .cb p{font-size:1.5vh;min-height:0;margin:0 0 .8vh;line-height:1.5}
+body.homefit .b{padding:.6vh;font-size:1.6vh}
+body.homefit .locked .lock{font-size:4vh}
+body.homefit #bot{flex:1;min-height:0;margin:1.2vh 0 0;gap:12px}
+body.homefit #bot>.pn{padding:1.2vh 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+body.homefit .pn h4{font-size:2.2vh;margin:0 0 .8vh}
+body.homefit .pn li{padding:.55vh 0;font-size:1.5vh}
+body.homefit .pn li i{width:3.2vh;height:3.2vh;font-size:1.5vh}
+body.homefit .mem img{flex:1;min-height:0;width:100%;object-fit:cover;margin-bottom:.8vh!important}
+body.homefit .mem p{font-size:1.5vh!important;margin:0 0 .8vh}
+body.homefit .mem .b{width:55%}
+body.homefit .tl{flex:1;align-items:center}
+body.homefit .tl:before{top:calc(50% - 2.2vh)}
+body.homefit .tl .c{width:7vh;height:7vh}
+body.homefit .tl div{font-size:1.5vh}
+body.homefit .out{margin-top:.8vh;padding:.6vh 22px;font-size:1.6vh}
+body.homefit #lb{position:static;margin-top:1vh;max-height:calc(100% - 1vh);overflow:auto}
+body.homefit #lb h4{font-size:2.2vh}
+body.homefit .dots{width:26px}
+body.homefit main.wrap{max-width:min(1560px,96vw)}body.homefit .hd{max-width:min(1560px,96vw)}body.homefit .ht p{max-width:70vh}body.homefit .b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.homefit .tl .c{width:min(9vh,6vw);height:min(9vh,6vw)}
+}</style>`);
+var _st2=showTab;showTab=function(k,n){_st2(k,n);document.body.classList.toggle('homefit',CUR=='home')};
+document.body.classList.toggle('homefit',CUR=='home');
+
+/* ===== v6: question bank (random per student) + teacher admin panel ===== */
+var PERST=3,MAXS=4*PERST*10;
+var QB=[
+/* 0: اسأل التاريخ — التأسيس والوثائق */
+[['من مؤسس الدولة البوسعيدية؟','الإمام أحمد بن سعيد البوسعيدي','السلطان سعيد بن سلطان','السلطان قابوس بن سعيد','السيد حمد بن سعيد'],
+['في أي عام تأسست الدولة البوسعيدية؟','1744م','1806م','1856م','1970م'],
+['ما اليوم الوطني لسلطنة عُمان؟','20 نوفمبر','23 يوليو','11 يناير','1 يناير'],
+['على أي مدينة كان الإمام أحمد بن سعيد والياً قبل مبايعته إماماً؟','صحار','نزوى','صلالة','مطرح'],
+['في أي بلدة وُلد الإمام أحمد بن سعيد؟','أدم','الرستاق','بهلاء','صور'],
+['ما المدينة التي اتخذها الإمام أحمد بن سعيد مقراً لحكمه؟','الرستاق','زنجبار','صلالة','جوادر'],
+['برز الإمام أحمد بن سعيد قبل مبايعته في مقاومة:','الغزو الفارسي','الغزو العثماني','الغزو الهولندي','الغزو الفرنسي'],
+['أي مدينة أرسل الإمام أحمد أسطولاً لنجدتها سنة 1775م؟','البصرة','مومباي','زنجبار','عدن'],
+['في أي عام توفي الإمام أحمد بن سعيد؟','1783م','1744م','1806م','1840م'],
+['من مؤلف كتاب «الفتح المبين في سيرة السادة البوسعيديين»؟','حميد بن محمد بن رزيق','أحمد بن نعمان الكعبي','رزيق بن بخيت','السيد سعيد بن سلطان'],
+['ما المهمة التي أسندها الإمام أحمد إلى رزيق بن بخيت؟','مسؤول الحساب في ميناء مسقط','قائد الأسطول','والي صحار','مبعوث إلى الهند'],
+['كم عاماً مرّ على تأسيس الدولة البوسعيدية في عام 2025م؟','281 عاماً','250 عاماً','300 عام','181 عاماً'],
+['من نقل مركز الحكم من الرستاق إلى مسقط؟','السيد حمد بن سعيد','الإمام أحمد بن سعيد','السلطان تيمور بن فيصل','السلطان ماجد بن سعيد'],
+['الصورة التاريخية لقلعة صحار في قسم الوثائق التُقطت سنة:','1940م','1840م','1970م','1744م'],
+['ما الوثيقة التي سمّى فيها السلطان قابوس خليفته؟','وصيته التي فُتحت سنة 2020م','معاهدة السيب','تحكيم كانينغ','معاهدة 1833م'],
+['في أي عام صدر النظام الأساسي للدولة؟','1996م','1970م','1920م','2020م'],
+['لماذا اختير 20 نوفمبر يوماً وطنياً؟','ذكرى تأسيس الدولة البوسعيدية سنة 1744م','ذكرى تولّي السلطان قابوس الحكم','ذكرى معاهدة السيب','ذكرى وصول السفينة سلطانة إلى نيويورك'],
+['أي أسرة حكمت عُمان قبل البوسعيديين مباشرة؟','اليعاربة','النباهنة','العباسيون','الأمويون'],
+['ما المدينة التي صارت عاصمة الدولة ومركز تجارتها البحرية بعد الرستاق؟','مسقط','نزوى','بهلاء','جبرين'],
+['«خريطة المنطقة سنة 1870م» في قسم الوثائق هي:','خريطة تاريخية','صورة فوتوغرافية','معاهدة','رسالة رسمية'],
+['وُصفت الدولة البوسعيدية بأنها دولة:','بحرية تجارية','زراعية مغلقة','رعوية صحراوية','جبلية معزولة'],
+['كيف عُرف السيد حمد بن سعيد في تفقّد أحوال الناس؟','بجولتين سنويتين يلتقي فيهما الناس','ببناء الأبراج','برحلاته إلى الهند','بكتابة الشعر'],
+['أول خطوة صحيحة للتحقق من معلومة تاريخية هي:','مقارنتها بأكثر من مصدر موثوق','تصديق أول موقع تجده','الاعتماد على الذاكرة','نشرها فوراً'],
+['الوثيقة التي كُتبت في زمن الحدث نفسه تُسمّى مصدراً:','أولياً','ثانوياً','خيالياً','مجهولاً'],
+['أي مما يلي مصدر أولي عن زيارة «سلطانة» لنيويورك؟','لوحة رُسمت للمبعوث في أثناء الزيارة','كتاب مدرسي حديث','مقال على الإنترنت','فيلم كرتوني'],
+['تُسمّى الأسرة الحاكمة في عُمان منذ 1744م:','الأسرة البوسعيدية (آل سعيد)','اليعاربة','النباهنة','الجبور'],
+['الإمام أحمد بن سعيد بُويع إماماً بعد:','إخراج القوات الفارسية من عُمان','وصول السفينة سلطانة','معاهدة السيب','اكتشاف النفط']],
+/* 1: عُمان عبر البحر */
+[['أي مدينة اتخذها السيد سعيد بن سلطان عاصمة ثانية؟','زنجبار','مومباي','جوادر','عدن'],
+['ما اسم السفينة العُمانية التي وصلت نيويورك سنة 1840م؟','سلطانة','جوهرة مسقط','شباب عُمان','فتح الخير'],
+['من مبعوث السفينة «سلطانة» إلى نيويورك؟','أحمد بن نعمان الكعبي','حميد بن رزيق','ماجد بن سعيد','رزيق بن بخيت'],
+['في أي عام وصلت السفينة «سلطانة» إلى نيويورك؟','1840م','1744م','1883م','1920م'],
+['مع أي دولة عقد السيد سعيد بن سلطان معاهدة صداقة وتجارة سنة 1833م؟','الولايات المتحدة','اليابان','روسيا','الصين'],
+['أي محصول شجّع السيد سعيد زراعته في زنجبار؟','القرنفل','القهوة','القطن','الأرز'],
+['ما الذي استفاد منه البحّارة العُمانيون في رحلاتهم إلى الهند وأفريقيا؟','الرياح الموسمية','الجبال الجليدية','المحركات البخارية','الأقمار الصناعية'],
+['ما اسم السفينة الشراعية الخشبية التقليدية في الخليج والمحيط الهندي؟','الداو','الغليون','الكارافيل','الغوّاصة'],
+['ما الذي يميّز بناء سفينة «جوهرة مسقط»؟','ألواحها مخيطة بالحبال دون مسامير','مصنوعة من الحديد','تعمل بالطاقة الشمسية','مصنوعة من البلاستيك'],
+['إلى أين أبحرت «جوهرة مسقط» سنة 2010م؟','سنغافورة','نيويورك','لندن','زنجبار'],
+['«جوهرة مسقط» تحاكي سفينة من:','القرن التاسع الميلادي','القرن العشرين','القرن الثامن عشر','العصر الحجري'],
+['من بنى قصر «بيت العجائب» في زنجبار؟','السلطان برغش بن سعيد','الإمام أحمد بن سعيد','السلطان تيمور بن فيصل','السلطان قابوس بن سعيد'],
+['في أي عام بُني «بيت العجائب»؟','1883م','1744م','1958م','1806م'],
+['بماذا اشتهر «بيت العجائب» عند بنائه؟','أول مبنى في شرقي أفريقيا يُضاء بالكهرباء','أعلى برج في العالم','أول مدرسة في عُمان','أكبر سوق في أفريقيا'],
+['ما المدينة الساحلية في مكران التي آلت إلى عُمان سنة 1784م؟','جوادر','كراتشي','بندر عباس','مومباي'],
+['متى انتقلت جوادر إلى باكستان؟','1958م','1856م','1970م','1920م'],
+['أي مضيق تطل عليه محافظة مسندم؟','مضيق هرمز','باب المندب','جبل طارق','ملقا'],
+['ما الحدث الذي أقرّ انفصال زنجبار عن عُمان سنة 1861م؟','تحكيم كانينغ','معاهدة السيب','معاهدة 1833م','النظام الأساسي'],
+['بعد انفصال زنجبار، التزمت زنجبار بأن تدفع لمسقط:','إعانة سنوية','لا شيء','سفناً حربية','نصف أراضيها'],
+['أي قلعتين تحرسان مدخل ميناء مسقط القديم؟','الجلالي والميراني','نزوى وبهلاء','جبرين والرستاق','صحار ونخل'],
+['أي مدينة أفريقية أسسها السلطان ماجد بن سعيد؟','دار السلام','ممباسا','مقديشو','نيروبي'],
+['ما الميناء الذي تطل عليه قلعة مطرح؟','ميناء مطرح','ميناء صلالة','ميناء صحار','ميناء الدقم'],
+['أول سفينة عربية تصل إلى الولايات المتحدة هي:','سلطانة','جوهرة مسقط','فتح الخير','شباب عُمان'],
+['حملت «سلطانة» هدايا من السيد سعيد بن سلطان إلى:','الرئيس الأمريكي','ملكة بريطانيا','شاه إيران','إمبراطور الصين'],
+['من أي ميناء أبحرت «سلطانة» إلى نيويورك؟','زنجبار','صلالة','البصرة','جوادر'],
+['في أي محيط تقع جزيرة زنجبار؟','المحيط الهندي','المحيط الأطلسي','المحيط الهادئ','المحيط المتجمد الشمالي'],
+['لماذا كانت مسقط ميناءً مهماً؟','لموقعها على طرق التجارة وحمايتها بالجبال والقلاع','لأنها بعيدة عن البحر','لأنها في وسط الصحراء','لأنها على نهر كبير']],
+/* 2: التاريخ يتحدث — الشخصيات */
+[['من حكم بين 1806 و1856م؟','السيد سعيد بن سلطان','السلطان قابوس بن سعيد','السلطان فيصل بن تركي','السلطان تركي بن سعيد'],
+['من قاد النهضة العُمانية الحديثة منذ 1970م؟','السلطان قابوس بن سعيد','السلطان سعيد بن تيمور','السلطان تيمور بن فيصل','السلطان هيثم بن طارق'],
+['في أي مدينة وُلد السلطان قابوس؟','صلالة','مسقط','نزوى','صحار'],
+['متى تولّى السلطان قابوس الحكم؟','23 يوليو 1970م','20 نوفمبر 1744م','11 يناير 2020م','1 يناير 1980م'],
+['متى تولّى السلطان هيثم بن طارق الحكم؟','11 يناير 2020م','23 يوليو 1970م','18 نوفمبر 2010م','20 نوفمبر 1996م'],
+['ترأّس السلطان هيثم قبل توليه الحكم لجنة:','رؤية عُمان 2040','معاهدة السيب','تحكيم كانينغ','بناء جوهرة مسقط'],
+['في عهد أي سلطان وُقّعت معاهدة السيب سنة 1920م؟','السلطان تيمور بن فيصل','السلطان قابوس بن سعيد','السيد سعيد بن سلطان','السلطان هيثم بن طارق'],
+['لمن تنازل السلطان تيمور بن فيصل عن الحكم سنة 1932م؟','ابنه سعيد بن تيمور','ابنه قابوس','أخيه فيصل','حفيده هيثم'],
+['كم عاماً حكم السلطان سعيد بن تيمور؟','38 عاماً','10 أعوام','50 عاماً','20 عاماً'],
+['في أي عام بدأ تصدير النفط العُماني؟','1967م','1840م','1920م','2000م'],
+['من حكم مسقط وعُمان بعد وفاة السيد سعيد بن سلطان سنة 1856م؟','السلطان ثويني بن سعيد','السلطان ماجد بن سعيد','السلطان تركي بن سعيد','السلطان فيصل بن تركي'],
+['من أول سلطان لزنجبار بعد انفصالها عن عُمان؟','السلطان ماجد بن سعيد','السلطان ثويني بن سعيد','السلطان قابوس بن سعيد','الإمام أحمد بن سعيد'],
+['من حكم بين 1871 و1888م وعمل على إعادة الاستقرار؟','السلطان تركي بن سعيد','السلطان فيصل بن تركي','السلطان ثويني بن سعيد','السلطان تيمور بن فيصل'],
+['من حكم بين 1888 و1913م؟','السلطان فيصل بن تركي','السلطان تركي بن سعيد','السلطان تيمور بن فيصل','السيد سعيد بن سلطان'],
+['من حكم بين 1792 و1804م وقوّى الأسطول العُماني؟','السيد سلطان بن أحمد','السيد حمد بن سعيد','السيد سعيد بن سلطان','الإمام أحمد بن سعيد'],
+['السيد حمد بن سعيد هو حفيد:','الإمام أحمد بن سعيد','السلطان قابوس بن سعيد','السلطان تركي بن سعيد','السلطان ثويني بن سعيد'],
+['يُعدّ أحمد بن نعمان الكعبي:','أول مبعوث عربي إلى الولايات المتحدة','أول سلطان لزنجبار','مؤسس مدينة دار السلام','باني قلعة نزوى'],
+['في أي عام توفي السلطان قابوس بن سعيد؟','2020م','1970م','1996م','2010م'],
+['من أصدر النظام الأساسي للدولة سنة 1996م؟','السلطان قابوس بن سعيد','السلطان سعيد بن تيمور','السلطان هيثم بن طارق','السلطان تيمور بن فيصل'],
+['في عهد من انتقلت جوادر إلى باكستان سنة 1958م؟','السلطان سعيد بن تيمور','السلطان قابوس بن سعيد','السلطان فيصل بن تركي','السلطان ثويني بن سعيد'],
+['عُرف السلطان قابوس بسياسة:','الحياد والسلام','العزلة التامة','الحروب التوسعية','إغلاق الموانئ'],
+['أين توفي السيد سعيد بن سلطان سنة 1856م؟','على متن سفينته في المحيط الهندي','في قلعة نزوى','في نيويورك','في الرستاق'],
+['ما الوصف الذي يُطلق على الإمام أحمد بن سعيد؟','الإمام المؤسس','قائد النهضة','أول سلطان لزنجبار','مؤسس دار السلام'],
+['من سلطان عُمان الحالي؟','السلطان هيثم بن طارق','السلطان قابوس بن سعيد','السلطان سعيد بن تيمور','السلطان تيمور بن فيصل'],
+['من والد السلطان قابوس؟','السلطان سعيد بن تيمور','السلطان تيمور بن فيصل','السيد سعيد بن سلطان','السلطان تركي بن سعيد'],
+['أي هؤلاء السلاطين حكم أولاً؟','السلطان تركي بن سعيد','السلطان فيصل بن تركي','السلطان تيمور بن فيصل','السلطان سعيد بن تيمور'],
+['أي هؤلاء الحكّام حكم الفترة الأطول؟','السلطان قابوس (1970–2020م)','السلطان ثويني (1856–1866م)','السلطان تيمور (1913–1932م)','السيد سلطان بن أحمد (1792–1804م)']],
+/* 3: الموسوعة الحية — القلاع والمعالم */
+[['من بنى قلعة نزوى؟','الإمام سلطان بن سيف اليعربي','الإمام أحمد بن سعيد','السلطان قابوس بن سعيد','السلطان برغش بن سعيد'],
+['بماذا تشتهر قلعة نزوى؟','برجها الدائري الضخم','سقوفها الزجاجية','أنها مبنية تحت الماء','أنها مصنوعة من الحديد'],
+['من بنى حصن جبرين؟','الإمام بلعرب بن سلطان اليعربي','السلطان برغش بن سعيد','السيد حمد بن سعيد','السلطان تيمور بن فيصل'],
+['بماذا يشتهر حصن جبرين؟','سقوفه الخشبية المزخرفة ونقوشه','برجه الدائري الضخم','أنه ميناء بحري','أنه أعلى مبنى في عُمان'],
+['أي قلعة عُمانية أُدرجت في قائمة التراث العالمي لليونسكو سنة 1987م؟','قلعة بهلاء','قلعة مطرح','قلعة الجلالي','قلعة صحار'],
+['من شيّد قلعتي الجلالي والميراني في القرن السادس عشر؟','البرتغاليون','البريطانيون','الفرس','الهولنديون'],
+['ما «بيت الزبير»؟','متحف في مسقط القديمة','قلعة في نزوى','سفينة تقليدية','سوق في صلالة'],
+['في أي مدينة تُوفي الإمام أحمد بن سعيد؟','الرستاق','نزوى','بهلاء','صحار'],
+['بُنيت قلعة مطرح لحماية:','ميناء مطرح','واحة بهلاء','جبل شمس','مدينة صلالة'],
+['كانت نزوى قديماً:','عاصمة للعلم والحكم في الداخل','ميناءً على المحيط الهندي','جزيرة في الخليج','مدينة أفريقية'],
+['كم مسماراً استُخدم في بناء سفينة «جوهرة مسقط»؟','لا شيء','مئة مسمار','ألف مسمار','مليون مسمار'],
+['ما الذي يحيط بمدينة بهلاء؟','سور طويل','نهر كبير','غابة استوائية','بحيرة عذبة'],
+['اكتمل بناء قلعة نزوى نحو عام:','1668م','1970م','1883م','1958م'],
+['بُني حصن جبرين نحو عام:','1670م','1883م','1958م','2010م'],
+['أي من هذه القلاع تقع في الداخل وليس على الساحل؟','قلعة نزوى','قلعة الجلالي','قلعة مطرح','قلعة الميراني'],
+['أي القلاع التالية تقع في مسقط؟','قلعة الجلالي','قلعة نزوى','حصن جبرين','قلعة بهلاء'],
+['ما وظيفة القلاع العُمانية قديماً؟','الدفاع والحكم وحماية المدن والطرق','الزراعة فقط','الترفيه فقط','صناعة السفن'],
+['ماذا يعرض متحف «بيت الزبير»؟','الأزياء والأسلحة والحُلي والأدوات التقليدية','السيارات الحديثة','الكائنات البحرية','الطائرات'],
+['الدولة البوسعيدية مستمرة منذ 1744م حتى:','اليوم','1856م','1920م','1970م'],
+['امتد حكم السيد سعيد بن سلطان نحو:','50 عاماً','5 أعوام','100 عام','20 عاماً'],
+['كانت الرستاق مقراً لحكم:','الإمام أحمد بن سعيد','السلطان قابوس بن سعيد','السلطان برغش بن سعيد','السلطان ماجد بن سعيد'],
+['أي مما يلي ليس قلعة عُمانية؟','بيت العجائب','قلعة نزوى','حصن جبرين','قلعة بهلاء'],
+['امتد نفوذ الدولة العُمانية في مراحلها إلى:','شرقي أفريقيا وسواحل الهند وإيران وباكستان','أوروبا الشمالية','أمريكا الجنوبية','أستراليا'],
+['ما المنظمة التي تُدرج المواقع في قائمة التراث العالمي؟','اليونسكو','الفيفا','أوبك','منظمة الصحة العالمية'],
+['من هم اليعاربة الذين بنوا قلعة نزوى وحصن جبرين؟','الأسرة التي حكمت عُمان قبل البوسعيديين','أسرة حكمت زنجبار','تجار من الهند','قادة برتغاليون'],
+['ما القلعة الموجودة في المدينة التي كان الإمام أحمد والياً عليها؟','قلعة صحار','قلعة نزوى','حصن جبرين','قلعة مطرح'],
+['أين تقع قلعة بهلاء؟','في داخل عُمان','في زنجبار','في جوادر','في مسندم']]];
+function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function pickQs(){var o=[];for(var s=0;s<4;s++){o.push(shuf(QB[s].map(function(_,i){return i})).slice(0,PERST).map(function(i){return{i:i,o:shuf([0,1,2,3]),w:0,d:0}}))}return o}
+function ensureQs(){if(U&&!U.qs){U.qs=pickQs();save()}}
+var _c0=C[0];C[0]=function(){var h=_c0();var k=h.indexOf('<p style="margin-top:10px"><b>اختبر');return k>-1?h.slice(0,k)+SRC:h};
+qz=function(st){ensureQs();var L=U.qs[st];return '<hr><p style="font-size:16px"><b>❓ أسئلة المرحلة</b> <span class="chip">'+L.filter(function(q){return q.d}).length+' / '+L.length+'</span></p>'+L.map(function(q,qi){var Q=QB[st][q.i];return '<div class="qb" id="qb'+qi+'" style="background:#fff8;border:1px solid #d9a94a88;border-radius:12px;padding:10px 12px;margin:8px 0"><p style="margin:0 0 6px"><b>'+(qi+1)+'. '+Q[0]+'</b></p>'+q.o.map(function(oi){var cls=q.d&&oi==0?' ok':'';return '<button class="opt'+cls+'" '+(q.d?'disabled':'')+' onclick="qa(this,'+st+','+qi+','+oi+')">'+Q[oi+1]+'</button>'}).join('')+'<p class="qf" style="margin:4px 0 0;font-size:13px">'+(q.d?'✅ أُجيب بنجاح':'')+'</p></div>'}).join('')};
+function qa(b,st,qi,oi){var q=U.qs[st][qi];if(q.d)return;var box=$('qb'+qi),f=box.querySelector('.qf');
+ if(oi==0){q.d=1;b.className='opt ok';var pts=Math.max(10-4*q.w,2);if(st==cur&&!U.done){U.score+=pts;f.textContent='✅ إجابة صحيحة! +'+pts+' نقاط'}else f.textContent='✅ إجابة صحيحة!';Array.prototype.forEach.call(box.querySelectorAll('button'),function(x){x.disabled=true});save();lbR();
+  if(U.qs[st].every(function(x){return x.d})){var fn=$('fin');if(fn){fn.disabled=false;fn.textContent='أنجزت المرحلة ✓'}}}
+ else{q.w++;b.className='opt no';b.disabled=true;f.textContent='❌ حاول مرة أخرى'+(q.w==1?' (ستحصل على 6 نقاط)':'');save()}}
+openS=function(i){if(i>cur)return;op=i;ensureQs();var d=i<cur;var all=U.qs[i].every(function(x){return x.d});
+ modal(S[i].t,C[i]()+(d?'<hr><p>✅ أنجزت هذه المرحلة.</p>':qz(i))+`<div style='text-align:center;margin-top:14px'><button id='fin' class='b' style='background:#1f6b49' ${d||all?'':'disabled'} onclick='fin()'>${d?'إغلاق':(all?'أنجزت المرحلة ✓':'أجب عن جميع الأسئلة أولاً')}</button></div>`)};
+var _doReg=doReg;doReg=function(){_doReg();if(U){U.qs=pickQs();save()}};
+/* ---------- TEACHER ADMIN ---------- */
+var ADM=false;function isAdm(){return ADM}
+function getPin(){try{return localStorage.getItem('bsPin')||'2026'}catch(e){return '2026'}}
+function admLogin(){modal('🔐 لوحة المعلم','<p>أدخل رمز المعلم:</p><input id="apin" type="password" inputmode="numeric" style="width:100%;padding:12px;border-radius:10px;border:2px solid #d9a94a;font-family:inherit;font-size:18px;text-align:center;color:#12303d;background:#fff"><p id="aerr" style="color:#a33;font-size:13px"></p><button class="b" style="background:#1f6b49" onclick="admChk()">دخول</button>');setTimeout(function(){var i=$('apin');if(i){i.focus();i.onkeydown=function(e){if(e.key=='Enter')admChk()}}},50)}
+function admChk(){if($('apin').value==getPin()){ADM=true;admPanel()}else $('aerr').textContent='الرمز غير صحيح.'}
+function admRows(){return rows()}
+function admPanel(){if(!ADM)return admLogin();var r=admRows();
+ modal('🔐 لوحة المعلم','<p style="font-size:13px">عدد النتائج: <b>'+r.length+'</b> · أسئلة المكتبة: <b>'+QB.reduce(function(a,b){return a+b.length},0)+'</b> · لكل طالب <b>'+PERST*4+'</b> سؤالاً عشوائياً (الدرجة من '+MAXS+')</p>'+
+ (r.length?'<table style="width:100%;border-collapse:collapse;font-size:14px"><tr style="background:#e8d5a8"><th style="padding:6px">#</th><th>الاسم</th><th>الدرجة</th><th>الزمن</th><th></th></tr>'+r.map(function(x,i){return '<tr style="border-bottom:1px solid #0002"><td style="padding:6px;text-align:center">'+(i+1)+'</td><td>'+esc(x.name)+'</td><td style="text-align:center">'+(Number(x.score)||0)+'</td><td style="text-align:center">'+fmt(Number(x.time))+'</td><td style="white-space:nowrap;text-align:left"><button class="mini" onclick="admRen(\''+x.id+'\')">✏️</button> <button class="mini" onclick="admDel(\''+x.id+'\')">🗑️</button></td></tr>'}).join('')+'</table>':'<p>لا توجد نتائج بعد.</p>')+
+ '<div style="display:grid;gap:6px;margin-top:14px"><button class="mbtn" onclick="admCsv()">⬇️ تنزيل النتائج (CSV / Excel)</button><button class="mbtn" onclick="admNext()">👤 إنهاء جلسة الطالب الحالي وتسجيل طالب جديد</button><button class="mbtn" style="color:#a33" onclick="admClear()">🧹 حذف جميع النتائج</button><button class="mbtn" onclick="admPinCh()">🔑 تغيير رمز المعلم</button><button class="mbtn" onclick="ADM=false;closeM()">🚪 خروج من لوحة المعلم</button></div><p class="src">ملاحظة: الرمز الافتراضي 2026؛ غيّره من هنا.</p>')}
+function setLocal(fn){try{var a=JSON.parse(localStorage.getItem('bsLB')||'[]');a=fn(a);localStorage.setItem('bsLB',JSON.stringify(a))}catch(e){}}
+function admDel(id){var x=admRows().filter(function(r){return r.id==id})[0];if(!confirm('حذف نتيجة «'+(x?x.name:'')+'»؟'))return;setLocal(function(a){return a.filter(function(r){return r.id!=id})});RW=RW.filter(function(r){return r.id!=id});if(DB)DB.collection('scores').doc(id).delete().catch(function(){});if(U&&U.id==id){try{localStorage.removeItem('bsUser')}catch(e){}U=null}lbR();admPanel()}
+function admRen(id){var x=admRows().filter(function(r){return r.id==id})[0];if(!x)return;var n=prompt('الاسم الجديد:',x.name);if(!n||!n.trim())return;n=n.trim().slice(0,30);setLocal(function(a){return a.map(function(r){if(r.id==id)r.name=n;return r})});RW.forEach(function(r){if(r.id==id)r.name=n});if(DB)DB.collection('scores').doc(id).update({name:n}).catch(function(){});if(U&&U.id==id){U.name=n;try{localStorage.setItem('bsUser',JSON.stringify(U))}catch(e){}}lbR();admPanel()}
+function admClear(){if(!confirm('حذف جميع النتائج نهائياً؟'))return;var ids=admRows().map(function(r){return r.id});try{localStorage.removeItem('bsLB')}catch(e){}RW=[];if(DB)ids.forEach(function(id){DB.collection('scores').doc(id).delete().catch(function(){})});lbR();admPanel()}
+function admCsv(){var r=admRows();var c='﻿الترتيب,الاسم,الدرجة,من,الزمن\n'+r.map(function(x,i){return [i+1,'"'+String(x.name).replace(/"/g,'""')+'"',Number(x.score)||0,MAXS,fmt(Number(x.time))].join(',')}).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv;charset=utf-8'}));a.download='نتائج-ذاكرة-البوسعيد.csv';document.body.appendChild(a);a.click();a.remove()}
+function admNext(){try{localStorage.removeItem('bsUser');localStorage.setItem('bsStage',0)}catch(e){}U=null;cur=0;AW={};closeM();render();lbR();showTab('home',1);showReg()}
+function admPinCh(){var p=prompt('أدخل رمز المعلم الجديد (4 أرقام أو أكثر):');if(!p||p.length<4)return;try{localStorage.setItem('bsPin',p)}catch(e){}alert('تم تغيير الرمز.')}
+document.head.insertAdjacentHTML('beforeend','<style>.mini{border:1px solid #d9a94a;background:#fffdf6;border-radius:8px;padding:3px 7px;cursor:pointer;font-size:14px}.mini:hover{background:#f3e3b8}.qb .opt{margin:4px 0}.opt:disabled{cursor:default;opacity:.85}</style>');
+var _ss=showSet;showSet=function(){_ss();$('mc').insertAdjacentHTML('afterbegin','<button class="mbtn" style="font-weight:800" onclick="admPanel()">🔐 لوحة المعلم (إدارة النتائج والأسماء)</button>')};
+/* quick admin access: long-press / double-click on leaderboard title */
+document.addEventListener('dblclick',function(e){if(e.target.closest('#lb h4'))admPanel()});
+rstJ=(function(o){return function(){if(!ADM)return admLogin();o();if(U){U.qs=pickQs();save()}}})(rstJ);
+clrLB=(function(o){return function(){if(!ADM)return admLogin();o()}})(clrLB);
+clrPh=(function(o){return function(){if(!ADM)return admLogin();o()}})(clrPh);
+ensureQs();
+
+lbR();
 </script>
 </body>
 </html>
